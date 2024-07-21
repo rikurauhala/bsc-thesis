@@ -1,0 +1,36 @@
+\chapter{Tiivisteiden murtaminen\label{ch:murtaminen}}
+
+Salasanoja ei säilytetä tietokannassa sellaisenaan luettavassa muodossa eli selvätekstinä (engl. \textit{plaintext}), vaan salatussa muodossa. Salaaminen toteutetaan tavallisesti laskemalla käyttäjän valitsemasta salasanasta kryptografinen tiiviste, joka tallennetaan tietokantaan. Näin toimitaan, jotta mahdollisesti vuotanut salasanatietokanta ei tarjoa hyökkääjälle suoraan pääsyä jokaisen käyttäjän kirjautumistietoihin. Myöskään palvelun ylläpitäjällä ei ole mahdollisuutta lukea käyttäjiensä salasanoja. Tavallista kaksisuuntaista salausta ei käytetä, sillä salausta ei ole missään vaiheessa tarkoitus purkaa. Kirjautumistilanteessa käyttäjän syöttämästä salasanasta lasketaan uudelleen tiiviste, jota verrataan tietokannasta löytyvään vastineeseen.
+
+Hyökkääjällä tarkoitetaan tämän tutkielman kontekstissa henkilöä tai ryhmää, joka pyrkii murtamaan salasanojen tiivisteitä. Salasanan tiivisteen murtamisella tarkoitetaan menetelmää, jolla yritetään saada salatussa muodossa säilytetty, alkuperäinen salasana selville. Käyttäjällä tarkoitetaan salasanan valinnutta palveluun rekisteröitynyttä henkilöä.
+
+Tiivistefunktiot soveltuvat hyvin salasanojen suojaamiseen, sillä operaatio on yksisuuntainen: tiivisteen perusteella ei ole mahdollista päätellä alkuperäistä käyttäjän valitsemaa salasanaa. Sisäänkirjautumistoiminnallisuus toteutetaan siten, että kirjautumista yrittävän käyttäjän syöttämästä salasanasta lasketaan uudelleen tiiviste, jota verrataan tietokantaan tallennettuun tiivisteeseen. Kryptografisen tiivisteen laskemiseen on olemassa erilaisia menetelmiä ja hyvin valitulla algoritmilla voidaan hidastaa hyökkääjän toimintaa \citep{andersson_hashes_2023}. Tähän palataan myöhemmin vielä luvussa~\ref{sec:tiivistefunktiot}.
+
+Jotta salasana voidaan murtaa, tulee hyökkääjällä ensin olla pääsy kohteena olevan salasanan tiivisteeseen tai listaan tiivisteitä. Tämän tutkielman puitteissa ei perehdytä keinoihin murtautua tietokantoihin, vaan hyökkääjän käytössä oletetaan olevan lista tiivisteistä, joita yritetään murtaa. Listoja salasanojen tiivisteistä on julkisesti saatavilla Internetissä erilaisten tietomurtojen ja -vuotojen jäljiltä. Suurimmat verkkoon päätyneet listat sisältävät jopa satoja miljoonia salasanojen tiivisteitä \citep{polychronakis_privacy_2017}. Nämä listat ovat hyökkääjälle erittäin hyödyllisiä, sillä niitä voidaan käyttää sellaisinaan murtamisen apuna tai niitä analysoimalla voidaan muodostaa listoja yleisimmistä salasanoista sekä päätellä, millaisia salasanoja ihmisillä on tapana valita.
+
+On myös huomioitava, että salasanojen murtaminen ei aina tarkoita laittoman toiminnan valmistelua. Ohjelmistokehittäjät voivat itse testata kehittämänsä palvelun tai käyttämiensä algoritmien heikkouksia. Samoja murtotekniikoita voidaan käyttää myös omien unohtuneiden salasanojen löytämiseksi. Toiminta kuitenkin muuttuu laittomaksi, jos toisen käyttäjän murretulla salasanalla kirjaudutaan luvattomasti palveluun \citep{finlex_rikoslaki_2015}.
+
+Tiivisteiden murtamista kutsutaan \textit{offline}-hyökkäykseksi kun se tapahtuu hyökkääjän omalla laitteistolla \citep{grassi_digital_2017}. Tiivisteiden murtaminen paikallisesti on erittäin tehokasta verrattuna \textit{online}-hyökkäykseen, jossa hyökkäys toteutettaisiin verkon yli suoraan palvelua vastaan. Internetin kautta palvelun omaa autentikointipalvelua vastaan suoritettavat hyökkäykset on mahdollista automatisoidusti havaita tietoliikennettä analysoimalla. Automatisoituja online-hyökkäyksiä voidaan yrittää torjua esimerkiksi kirjautumisyritysten määrää rajoittamalla tai vaatimalla käyttäjää läpäisemään CAPTCHA-testi \citep{owasp_authentication_2023}. Offline-hyökkäyksessä hyökkääjän toimintaa rajoittavat vain käytössä oleva laskentateho, käytetyt murtamismenetelmät sekä tiivistefunktion ominaisuudet.
+
+Seuraavassa luvussa (luku~\ref{ch:menetelmat}) esiteltävät murtamismenetelmät perustuvat algoritmiin~\ref{alg:algoritmi1} \citep{owasp_storage_2023}.
+
+\begin{algorithm}
+    \caption{Salasanan selvittäminen tiivisteitä vertaamalla\label{alg:algoritmi1}}
+    \begin{algorithmic}[1]
+        \Procedure{vertaaTiivisteitä}{\textit{tiivisteKohde}, \textit{salasanaKandidaatit}}
+            \For{\textbf{each} \textit{salasanaKandidaatti} \textbf{in} \textit{salasanaKandidaatit}}
+                \State \textit{tiivisteKandidaatti} $\gets$ \Call{LaskeTiiviste}{\textit{salasanaKandidaatti}}
+                \If{\textit{tiivisteKandidaatti} $=$ \textit{tiivisteKohde}}
+                    \State \textbf{Output:} \textit{salasanaKandidaatti}
+                    \State \textbf{break}
+                \EndIf
+            \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+Koska tiivistefunktio on yksisuuntainen, eli tiivisteestä ei voida suoraan salausta purkamalla palauttaa alkuperäistä arvoa, perustuu murtaminen kryptografisten tiivisteiden vertailemiseen. Algoritmissa~\ref{alg:algoritmi1} funktio \textit{vertaaTiivisteitä} saa parametreina murrettavan salasanan tiivisteen \textit{tiivisteKohde} sekä listan selväkielisistä salasanoista \textit{salasanaKandidaatit}. Jokaiselle salasanakandidaatille lasketaan tiiviste käyttämällä samaa algoritmia eli tiivistefunktiota, jolla kohteena olevan salasanan tiiviste on laskettu. Tiivisteitä vertaillaan keskenään ja jos ne täsmäävät, on salasana murrettu onnistuneesti. Kun salasana on murrettu, laskenta voidaan keskeyttää ja mahdollisesti aloittaa uudestaan jollakin toisella tiivisteellä, mikäli murrettavia salasanoja on useampia. 
+
+Teoriassa kaksi keskenään erilaista salasanaa voivat tuottaa saman tiivisteen, mutta nykyaikaisten tiivistealgoritmien kohdalla tämä on erittäin harvinaista. Lähtökohtaisesti täsmäävä tiiviste tarkoittaa siis onnistunutta murtamisyritystä. Algoritmi tiivistefunktion laskemiseksi tulee valita siten, että tiivisteiden törmääminen (engl. \textit{hash collision}) on laskennallisesti hyvin epätodennäköistä \citep{menenez_handbook_1997}. Kyseessä on itse asiassa eräs tiivistefunktiolle asetettava keskeinen vaatimus. Tähän palataan tarkemmin luvussa~\ref{sec:tiivistefunktiot}.
+
+Salasanan tiivisteen murtamiseen tähtäävät hyökkäysmetodit perustuvat pohjimmiltaan havaintoon siitä, että halutaan muodostaa mahdollisimman optimaalinen lista salasanakandidaateista. Lista kokeiltavista salasanoista voi olla määritelty valmiiksi ennalta tai se voidaan muodostaa ohjelmallisesti. Seuraavassa luvussa tutustutaan tarkemmin erilaisiin hyökkäysmenetelmiin eli keinoihin murtaa salasanojen tiivisteitä.

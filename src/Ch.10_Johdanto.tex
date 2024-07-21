@@ -1,0 +1,23 @@
+\chapter{Johdanto\label{ch:johdanto}}
+
+Internetin aikakaudella rekisteröityminen erilaisiin palveluihin on muodostunut tavalliseksi ja usein jopa välttämättömäksi osaksi ihmisten elämää. Ohjelmistokehityksen näkökulmasta eräs keskeinen haaste on käyttäjän todentaminen. Rekisteröitynyt käyttäjä on pystyttävä tunnistamaan luotettavasti.
+
+Salasanat ovat yleinen käyttäjän todentamiseen käytetty menetelmä. Vaikka ohjelmiston tietoturva olisi muuten kunnossa, salasanaan perustuva kirjautumistoiminnallisuus tarjoaa pahantahtoiselle hyökkääjälle mahdollisuuden yrittää murtautua sisään palveluun ja päästä luvatta käsiksi käyttäjän tietoihin. Puutteet salasanojen säilyttämisessä tai huonosti valittu salasana voivat vaarantaa koko palvelun tietoturvan.
+
+Salasanojen käyttöön liittyvät ongelmat johtuvat usein käyttäjästä itsestään. Ihmisillä on taipumusta valita lyhyitä, helposti arvattavia salasanoja, jotka saattavat jopa löytyä sellaisenaan sanakirjasta \citep{shen_user_2016}. Salasanaan saattaa myös sisältyä julkisesti saatavilla olevaa käyttäjään liittyvää henkilökohtaista tietoa, kuten vuosilukuja tai lemmikkien nimiä \citep{bosnjak_brute-force_2018}.
+
+Vaikka vaihtoehtoisia tapoja käyttäjän todentamiseen on kehitetty, salasanat ovat edelleen yleisimmin käytetty autentikointimenetelmä erityisesti verkkosovelluksissa ja tietokoneohjelmissa \citep{zimmermann_password_2020}. Salasanat ovat houkutteleva kohde verkossa toimiville rikollisille, sillä niitä käytetään usein suojaamaan arvokasta tietoa \citep{shen_user_2016}. Tämän vuoksi salasanojen tietoturva on erityisen tärkeä ja mielenkiintoinen tutkimuskohde. Koska selkeää korvaajaa salasanoille suosituimpana todennusmenetelmänä ei ole lähitulevaisuudessa nähtävissä, on sekä sovelluskehittäjien että käyttäjien etu tuntea yleisimmät hyökkäystekniikat ja osata suojautua niitä vastaan.
+
+Tässä tutkielmassa perehdytään salasanojen kryptografisten tiivisteiden (engl. \textit{cryptographic hash}) murtamisen menetelmiin ja niiltä suojautumiseen sekä sovelluskehittäjän, että käyttäjän näkökulmista. Tutkimusta ohjaa kaksi tutkimuskysymystä, joita tutkielman rakenne noudattaa. Tutkimuskysymykset on määritelty seuraavasti.
+
+\begin{quote}
+    \textbf{Tutkimuskysymys 1\label{rq1}}: Mitä menetelmiä voidaan käyttää salasanojen tiivisteiden murtamiseen?
+    
+    \textbf{Tutkimuskysymys 2\label{rq2}}: Miten näiltä menetelmiltä voidaan suojautua?
+\end{quote}
+
+Aluksi luvussa~\ref{ch:murtaminen} perehdytään siihen, mitä tiivisteiden murtaminen oikeastaan tarkoittaa ja mihin murtamiseen tähtäävät menetelmät perustuvat. Luvussa~\ref{ch:menetelmat} syvennytään aiheeseen käsittelemällä tarkemmin yleisimpiä tiivisteiden murtamiseen käytettyjä keinoja. Luku vastaa tutkimuskysymykseen~\hyperref[rq1]{1}. Pääpaino on teknisissä, ohjelmallisesti toteutettavissa tavoissa murtaa salasanojen tiivisteitä. Salasanojen murtamisesta (engl. \textit{password cracking}) puhuttaessa tarkoitetaan nimenomaan tiivisteiden murtamista, eli alkuperäisen käyttäjän valitseman salasanan selvittämistä tiivisteitä vertailemalla. Salasanoja voidaan pyrkiä selvittämään myös muilla keinoilla, kuten käyttäjää manipuloimalla (engl. \textit{social engineering}) tai näppäintallentimilla (engl. \textit{keylogger}), mutta nämä keinot eivät kuulu tämän tutkielman piiriin.
+
+Kun tavanomaiset tiivisteiden murtamisen menetelmät on käsitelty, luvussa~\ref{ch:suojautuminen} esitetään miten niiltä voidaan suojautua ja vastataan tutkimuskysymykseen~\hyperref[rq2]{2}. Sekä käyttäjän, että sovelluskehittäjän näkökulmat on otettu huomioon, sillä molempien toiminnalla on vaikutus sovelluksen tietoturvaan. Suojautumiskeinojen kohdalla myös pohditaan sitä, mikä on sovelluskehittäjän vastuulla ja mitä käyttäjän on itse osattava ottaa huomioon.
+
+Lopuksi luvussa~\ref{ch:yhteenveto} käydään vielä lyhyesti läpi keskeiset tulokset ja pohditaan niiden vaikutusta.

@@ -1,0 +1,9 @@
+\begin{abstract}
+
+Salasanat ovat yleisin käyttäjän todentamiseen käytetty menetelmä. Salasanat tallennetaan tavallisesti tietokantaan kryptografisina tiivisteinä, jotka on laskettu yksisuuntaisen tiivistefunktion avulla. Tiivisteitä sisältäviä tietokantoja päätyy toisinaan tietomurtojen seurauksena ulkopuolisten haltuun. Koska salasanoilla suojattava tieto saattaa olla hyvinkin arvokasta, verkossa toimivilla rikollisilla on mielenkiintoa alkuperäisten salasanojen selvittämiseen vuotaneiden tiivisteiden avulla.
+
+Tässä kandidaatin tutkielmassa perehdytään yleisimpiin salasanojen tiivisteiden murtamisen menetelmiin sekä niiltä suojautumiseen. Tutkielma luo kattavan yleiskatsauksen aihepiiriin ja tarjoaa työkaluja sovelluskehittäjille salasanojen turvalliseen säilyttämiseen sekä käyttäjille vahvan salasanan valintaan. Tutkielmassa esitellään salasanojen tiivisteiden murtamisen perusteet ja käydään läpi yleisimmät hyökkäysmenetelmät: väsytyshyökkäys, sanakirjahyökkäys, sääntöihin perustuva mukautettu hyökkäys sekä sateenkaaritaulukko.
+
+Ohjelmistokehittäjää suositellaan tallentamaan palvelunsa salasanat tietokantaan tiivisteinä, jotka on laskettu käyttämällä nykyaikaista tiivistealgoritmia kuten bcrypt tai Argon2. Käyttäjän tulisi valita salasanakseen mahdollisimman suuresta merkistöstä mahdollisimman pitkä, satunnaisesti generoitu merkkijono. Sovelluskehittäjän tulee lisätä palveluunsa tuki monivaiheiselle tunnistautumiselle ja käyttäjän on osattava ottaa se käyttöön.
+
+\end{abstract}

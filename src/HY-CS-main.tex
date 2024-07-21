@@ -1,0 +1,82 @@
+\documentclass[finnish,twoside,censored,tkt]{HYthesisML} 
+\PassOptionsToClass{openany,twoside,a4paper}{report}
+
+\usepackage[chapter]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath, amssymb}
+\usepackage[
+    backend=biber,
+    bibstyle=authoryear,
+    giveninits=true,
+    maxnames=99,
+    maxcitenames=2,
+    natbib=true,
+    style=authoryear,
+    uniquelist=minyear,
+    uniquename=mininit
+]{biblatex}
+\usepackage{csquotes}
+\usepackage{epsfig}
+\usepackage{fancyhdr}
+\usepackage{lmodern}
+\usepackage{subfigure}
+\usepackage{textcomp}
+\usepackage[pdftex]{color, graphicx}
+\usepackage[pdftex, plainpages=false]{hyperref}
+
+\floatname{algorithm}{Algoritmi}
+
+\singlespacing
+\fussy
+
+\addbibresource{bibliography.bib}
+\DeclareNameAlias{sortname}{family-given}
+
+\title{Salasanojen tiivisteiden murtamisen menetelmät ja niiltä suojautuminen}
+\author{Riku Rauhala}
+\date{\today}
+\supervisors{Nikolaj Tatti, Iiro Kumpulainen}
+\keywords{salasanat, tietoturva, todennus}
+\additionalinformation{\translate{\track}}
+\classification{\protect{\ \\
+    Security and privacy $\rightarrow$ Security services $\rightarrow$ Authentication \\
+    Security and privacy $\rightarrow$ Software and application security
+}}
+
+\hypersetup{
+    citecolor=black,
+    colorlinks=true,
+    filecolor=magenta,
+    linkcolor=black,
+    pdfauthor={Riku Rauhala},
+    pdfcreator={},
+    pdffitwindow=false,
+    pdfkeywords={salasanat} {tietoturva} {todennus},
+    pdfmenubar=true,
+    pdfnewwindow=true,
+    pdfproducer={pdfLaTeX},
+    pdfstartview={FitH},
+    pdfsubject={},
+    pdftitle={Salasanojen tiivisteiden murtamisen menetelmät ja niiltä suojautuminen},
+    pdftoolbar=true,
+    unicode=true,
+    urlcolor=cyan,
+}
+
+\begin{document}
+    \maketitle
+    \include{Ch.00_Tiivistelma}
+    \mytableofcontents
+    
+    \mainmatter
+    \include{Ch.10_Johdanto}
+    \include{Ch.20_Murtaminen}
+    \include{Ch.30_Menetelmat}
+    \include{Ch.40_Suojautuminen}
+    \include{Ch.50_Yhteenveto}
+    \include{Ch.60_Tekoaly}
+
+    \addcontentsline{toc}{chapter}{Tekoälyn käyttö tutkielmassa}
+    \addcontentsline{toc}{chapter}{\bibname}
+    \printbibliography
+\end{document}

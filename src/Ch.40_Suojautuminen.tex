@@ -1,0 +1,121 @@
+\chapter{Suojautuminen\label{ch:suojautuminen}}
+
+Salasanojen tiivisteiden murtamiselta voidaan myös suojautua. Osa vastuusta on sovelluskehittäjällä, jonka tehtävä on suojata tietokantaan tallennettuja salasanoja sekä estää niiden joutuminen vääriin käsiin. Vuotanut salasanatiivisteiden tietokanta tekee aina murtamisesta huomattavasti helpompaa hyökkääjälle, jonka toimintaa rajoittavat vuodon jo tapahduttua enää käytettävissä olevan laitteiston laskentateho sekä hyökkääjän oma tietotaito ja oveluus. Hyökkäys verkon yli palvelua vastaan on paljon monimutkaisempaa ja helpommin torjuttavissa.
+
+Sovelluskehittäjän on mahdollista yrittää ohjata käyttäjää valitsemaan vahva salasana sekä asettaa salasanalle vaatimuksia. Salasanan valitseminen on kuitenkin lopulta käyttäjän itsensä vastuulla. Koska tiedetään, että käyttäjät valitsevat yleensä heikkoja salasanoja, on sovelluskehittäjän vastuulla kuitenkin korostunut käytännön merkitys.
+
+\section{Tiivistefunktiot\label{sec:tiivistefunktiot}}
+
+Kryptografisen tiivisteen laskemiseen on kehitetty erilaisia algoritmeja eli tiivistefunktioita, joiden soveltuvuus salasanojen turvaamiseksi on vaihteleva. On ohjelmistokehittäjän vastuulla valita käyttötarkoitukseen sopiva algoritmi. Salasanat tulee säilyttää tietokannassa aina tiivisteinä, ei selvätekstinä. Näin tulee menetellä vaikka sovelluskehittäjä uskoisi omaan kykyynsä pitää tietokannan data suojassa. Tiivistealgoritmin valitseminen ja käyttäminen on välttämätöntä, sillä on syytä varautua ennalta salasanatietokannan vuotamiseen. 
+
+Tiivisteiden laskemiseen käytetyn algoritmin tulee täyttää kolme vaatimusta ollakseen turvallinen \citep{dang_recommendation_2012}. Ensinnäkin, tiivisteiden törmäämisen tulee olla käytännössä mahdotonta. Tätä ominaisuutta kutsutaan törmäyskestävyydeksi (engl. \textit{collision resistance}). Vaatimuksen tarpeellisuus on ilmeistä, sillä kahden eri salasanan ei tulisi missään tilanteessa tuottaa samaa kryptografista tiivistettä. Mikäli näin olisi, mahdollistaisi tiivisteiden vertailemiseen perustuva kirjautumistoiminnallisuus käyttäjän todentamisen myös jollakin muulla merkkijonolla kuin alkuperäisellä käyttäjän valitsemalla salasanalla.
+
+Toiseksi, on oltava laskennallisesti mahdotonta (engl. \textit{computationally infeasible}) löytää tiivisteen perusteella alkuperäistä arvoa \citep{dang_recommendation_2012}. Toisin sanoen, tiivistefunktion on oltava yksisuuntainen operaatio. Tätä ominaisuutta kutsutaan alkukuvakestävyydeksi (engl. \textit{preimage resistance}).
+
+Vastaavasti kolmas tiivistefunktiolle asettava vaatimus on, että tiivisteen perusteella ei ole mahdollista löytää jotakin toista selväkielistä salasanaa, jolla olisi sama tiiviste. \citep{dang_recommendation_2012}. Tätä ominaisuutta nimitetään toiseksi alkukuvakestävyydeksi (engl. \textit{second preimage resistance}).
+
+Salasanojen säilyttämiseen käytettävän tiivistefunktion on lisäksi oltava hieman yllättäen toiminnaltaan riittävän hidas \citep{owasp_storage_2023}. Kun algoritmin suorittaminen on laskennallisesti ja ajallisesti vaativampaa, hyökkääjän toiminta hidastuu. Vaatimus perustuu siihen, että yhden tiivisteen laskeminen käyttäjän kirjautuessa sisään ei aiheuta vielä huomattavia ongelmia, mutta miljoonia tiivisteitä laskevan hyökkääjän toiminta hidastuu huomattavasti.
+
+Vaatimukset täyttäviä, suositeltuja nykyaikaisia algoritmeja ovat Argon2id, scrypt sekä bcrypt \citep{owasp_storage_2023}.
+
+\section{Kryptografinen suola ja pippuri\label{sec:kryptografinen_suola}}
+
+Eräs tapa hidastaa hyökkääjän toimintaa on käyttää kryptografista suolaa. Tiivisteen laskeminen suolan avulla varmistaa sen, että tiiviste ei ole ennalta arvattavissa vaikka käytetty tiivistefunktio ja alkuperäinen salasana tunnettaisiin. Tämä tarkoittaa sitä, että kryptografisen suolan käyttäminen tarjoaa suojaa erityisesti sateenkaaritaulukkoa vastaan, sillä suolan kanssa laskettu tiiviste ei voi löytyä taulukosta jo valmiiksi laskettuna. Kuten luvussa~\ref{sec:sateenkaaritaulukko} todettiin, sateenkaaritaulukon toiminta perustuu siihen, että sama tiivistefunktio tuottaa samalla salasanalla aina saman tiivisteen. Taulukossa~\ref{tab:identtinen_tiiviste} on esimerkki siitä miten kaksi käyttäjää saattavat valita saman salasanan, jolloin tietokantaan tallentuu molempien kohdalle täysin identtinen tiiviste. Taulukon tiiviste on kuvitteellinen esimerkki eikä sitä ole laskettu millään oikealla tiivistefunktiolla.
+
+\begin{table}[ht]
+    \centering
+    \caption{Tiivisteen muodostuminen identtisellä salasanalla\label{tab:identtinen_tiiviste}}
+    \begin{tabular}{ | c | c | c | }
+        \hline
+        Käyttäjä & Salasana    & Tiiviste \\
+        \hline
+        Matti    & salainen123 & Z59HDNEC5TZJMNK1N2JA4SBD6Y9HD \\
+        Maija    & salainen123 & Z59HDNEC5TZJMNK1N2JA4SBD6Y9HD \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Koska kahdella identtisellä salasanalla on samalla tiivistefunktiolla laskettuna myös sama kryptografinen tiiviste, hyökkääjä voi yhden tiivisteen murtamalla selvittää kerralla jopa tuhansien käyttäjien salasanan. Kun jokaiselle salasanalle valitaan mielivaltaisesti eri suola, saadaan identtisille salasanoille muodostettua eri tiivisteet. Tämä hidastaa hyökkääjän toimintaa, sillä nyt jokainen tiiviste on murrettava erikseen. Taulukosta~\ref{tab:suola} nähdään, että suolaa käyttämällä kahden käyttäjän valitsema identtinen salasana johtaa keskenään täysin erilaisten tiivisteiden muodostumiseen.
+
+\begin{table}[ht]
+    \centering
+    \caption{Tiivisteen muodostuminen suolaa käyttämällä\label{tab:suola}}
+    \begin{tabular}{ | c | c | c | c | }
+        \hline
+        Käyttäjä & Salasana    & Suola        & Tiiviste \\
+        \hline
+        Matti    & salainen123 & oP811rA3e@g9 & R325CGJ19OEO9DTZYNPTIX7P8WJJ2 \\
+        Maija    & salainen123 & Gy453.95£?mY & 99D1FFES5Z5ILYTD8FKAO3H5U88TC \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Kryptografinen suola voi olla mikä tahansa mielivaltaisesti valittu merkkijono. Se voidaan esimerkiksi generoida satunnaisesti käyttäjälle tämän rekisteröityessä ja tallentaa tietokantaan sellaisenaan tiivisteen lisäksi. Se miten suolaa käytetään riippuu käytössä olevan tiivistefunktion toteutuksesta. Eräs mahdollinen tapa on konkatenoida käyttäjän syöttämä salasana ja suola, ja laskea näin saadusta merkkijonosta tiiviste. Koska myös suola tallennetaan tietokantaan, voidaan käyttäjän kirjautuessa sisään operaatio toistaa samalla kaavalla ja toteuttaa todennus normaalisti vertaamalla tiivisteitä.
+
+Ollakseen riittävän turvallinen, on suolan oltava tarpeeksi pitkä. Mikäli suola on liian lyhyt, on tiiviste edelleen haavoittuvainen sateenkaaritaulukolle. Riittävän pitkä suola takaa sen, että jokaisen suolan ja salasanan yhdistelmän kerääminen sateenkaaritaulukkoon muuttuu laskennallisesti liian vaativaksi. Toinen suolan turvalliselle käytölle asetettava vaatimus on, että jokaiselle käyttäjälle valitaan uniikki suola. Mikäli samaa suolaa käytetään kaikille käyttäjille, muodostuu identtisille salasanoille jälleen identtiset tiivisteet. Samalla myös sateenkaaritaulukon käyttö on edelleen vaivatonta, sillä hyökkääjä joutuu vain laskemaan taulukon arvot kertaalleen uudelleen.
+
+Idea kryptografisesta suolasta voidaan myös viedä vielä pidemmälle paikkaamaan sen mahdollisia heikkouksia. Mikäli suola päätetään pitää kokonaan salaisena ja säilyttää erillään tiivisteestä, sitä kutsutaan nimellä pippuri.
+
+Pippurin käyttöön pätevät samat säännöt kuin suolaankin, mutta pippuri voi olla sama kaikille käyttäjille. Tällöin pippurin tulisi kuitenkin olla riittävän pitkä, jotta sen arvoa ei pystytä selvittämään väsytyshyökkäyksellä. Ero kryptografisen suolan ja pippurin välillä syntyy siitä, että salasanatietokannan päädyttyä hyökkääjän käsiin, voidaan tiivisteitä lähteä murtamaan suolan avulla, mutta pippurin kanssa tämä ei onnistu jos tiiviste ja pippuri on oikeaoppisesti säilytetty eri paikoissa. Suolaa ja pippuria voidaan myös käyttää yhdessä lisäsuojauksen saamiseksi.
+
+\section{Avaimen venytys\label{sec:avaimen_venytys}}
+
+Hyökkääjän toimintaa voidaan hidastaa avaimen venytyksen (engl. \textit{key stretching}) avulla. Venytyksen toteuttamiseen on olemassa erilaisia menetelmiä, jotka kaikki pyrkivät tekemään tiivisteen murtamisesta laskennallisesti vaativampaa. Venytystä käytetään usein yhdessä kryptografisen suolan kanssa.
+
+Eräs tapa toteuttaa avaimen venytys on laskea tiiviste uudelleen ja uudelleen sisäkkäisillä funktiokutsuilla. Tällöin venytys voidaan toteuttaa jo käytössä olevilla työkaluilla. Olkoon $h$ jokin tiivistefunktio. Nyt tiiviste voidaan laskea käyttäjän syöttämästä salasanasta sekä mielivaltaisesta suolasta, eli $\text{tiiviste} = h(h(h(h(h(\text{salasana}, \text{suola})))))$.
+
+Lopullinen tiiviste saadaan siis laskemalla tiivisteen tiiviste viisi kertaa sisäkkäisillä funktiokutsuilla. Iteraatioiden määrä on ohjelmistokehittäjän päätettävissä. Vaikka avaimen venyttäminen tekee yksittäisen tiivisteen laskemisesta hitaampaa, sillä ei ole kirjautuvan käyttäjän kannalta huomattavaa vaikutusta. Venytyksen merkitys paljastuu kun tiivisteitä yritetään murtaa: yhden tiivisteen murtaminen on nyt laskennallisesti ja ajallisesti vaativampaa ja hyökkäyksen teho hidastuu riippumatta käytetystä hyökkäysmenetelmästä.
+
+\section{Vahva salasana\label{sec:vahva_salasana}}
+
+Käyttäjän näkökulmasta merkityksellisin tapa suojautua on mahdollisimman vahvan salasanan valitseminen. Kuitenkin myös sovelluskehittäjän on tunnettava salasanan vahvuuden mittarit sekä vahvan salasanan piirteet. Käyttäjän syöttämä salasana tavallisesti validoidaan ennen sen hyväksymistä ja täten salasanan hyväksyminen tai hylkääminen on lopulta sovelluskehittäjän päätäntävallassa. Sovelluskehittäjä voi pyrkiä ohjaamaan käyttäjää vahvemman salasanan valitsemiseen salasanankäytäntöjen avulla.
+
+\subsection{Entropia\label{subsec:entropia}}
+
+Salasanan vahvuudelle on kehitetty erilaisia mittareita. Eräs näistä mittareista on salasanan entropia, joka mittaa hyökkääjän kohtaamaa epävarmuutta salasanojen murtamisessa \citep[s. 9]{burr_electronic_2013}. Entropian yksikkö on bitti.
+
+Satunnaisesti valitun salasanan entropia $H$ voidaan laskea kaavan H = $\log_{2}(b^l)$ avulla \citep[s. 104]{burr_electronic_2013}. Kaavassa $b$ merkitsee käytetyn aakkoston kokoa eli uniikkien merkkien lukumäärää ja $l$ valitun salasanan pituutta merkkeinä. Jos salasana muodostetaan esimerkiksi valitsemalla satunnaisesti seitsemän merkkiä suomen kielen 29 aakkosen joukosta, voidaan salasanan entropiaksi laskea $\log_{2}(29^{7}) \approx 34$ eli 34 bittiä. Kaavassa $b^l$ siis kuvaa mahdollisten kombinaatioiden määrää. Koska entropian määrää mitataan kaksikantaisen logaritmin avulla laskettuina bitteinä, jokainen lisäbitti kaksinkertaistaa salasanan murtamiseksi tarvittavien arvausten määrän. Mitä korkeampi määrä bittejä entropiaa, sitä vahvempi salasana.
+
+Koska entropia kuvaa tiivisteen murtamiseksi tarvittavien arvausten määrää, voidaan sitä käyttää arvioimaan murtamiseen kuluvaa aikaa. Salasanalle laskettu entropia voidaan jakaa arvausten määrällä per sekunti. Se montaako tiivistettä voidaan testata joka sekunti riippuu monesta tekijästä kuten tiivisteiden laskemiseen käytetystä tiivistefunktiosta, mahdollisista hidasteista kuten avaimen venytyksestä sekä hyökkääjän käytössä olevasta laitteistosta.
+
+Entropiaa salasanan vahvuuden mittarina on myös kritisoitu. Koska salasanat eivät noudata mitään tilastollista jakaumaa, entropiaa ei voida pitää sopivana käyttötarkoitukseen \citep{ma_password_2010}. Entropian laskeminen ei ole myöskään aivan yhtä yksinkertaista käyttäjien itse valitsemille salasanoille, sillä ne eivät ole satunnaisia ja täten salasanan eri merkkien esiintymistiheys ei jakaudu tasaisesti \citep[s. 105]{burr_electronic_2013}.
+
+Tarkastellaan entropian ongelmallisuutta vielä esimerkin kautta. Valitaan suomen kielen 29 aakkosen joukosta kaksi salasanaa: "aarrearkku"~ja~"xdöfujpvif". Salasanoista ensimmäinen on käyttäjän valitsema, suomen kielen sana ja toinen taas on satunnaisesti generoitu merkkijono samassa aakkostossa. On selvää, että ensimmäinen salasana on murrettavissa erittäin nopeasti sanakirjahyökkäyksellä, kun taas toinen on näennäisesti satunnainen ja vaatii todennäköisesti väsytyshyökkäyksen murtuakseen. Kuitenkin entropian laskukaavan perusteella molemmilla on $\log_{2}(29^{10}) \approx 46$ bittiä entropiaa.
+
+\subsection{Salasanan valitseminen\label{subsec:salasanan:valitseminen}}
+
+Käyttäjän vastuulla on mahdollisimman vahvan salasanan valitseminen. Tarkastellaan seuraavaksi turvallisen salasanan piirteitä pitäen mielessä yleisimmät salasanojen murtamiseen käytetyt hyökkäysmenetelmät.
+
+On selvää, että sanakirjahyökkäystä vastaan suojautuakseen käyttäjän valitseman salasanan ei tule löytyä sanakirjasta. Valittu salasana ei siis saisi olla mikään tavallinen jonkin luonnollisen kielen sana, vaikka se olisikin kirjoitettu poikkeavalla tavalla (esim. "aarrearkku"~$\rightarrow$~"aArrEarKku"). Käyttäjän ei myöskään kannata yrittää olla nokkela ja korvata kirjaimia erikoismerkeillä tai numeroilla, sillä myös yleiset muunnokset kuten A-kirjaimen muuttaminen sitä muistuttavaksi @-merkiksi tai E-kirjaimen korvaaminen numerolla~3 ovat varmasti hyökkääjien tiedossa (esim. "aarrearkku"~$\rightarrow$~"@@rr3@rkku"). Tällaiset muutokset ovat helposti murrettavissa sääntöjen avulla (ks. luku~\ref{sec:mukautettu_hyokkays}).
+
+Valitun salasanan on oltava uniikki jokaista palvelua kohden. Käyttäjän ei siis tule käyttää samaa salasanaa useammin kuin kerran. Mikäli käyttäjä on rekisteröitynyt palveluun A ja B samalla salasanalla ja palvelussa A tapahtuu tietomurto, on käyttäjän tili vaarassa myös palvelussa B. Muuten ominaisuuksiltaan turvallinen, mutta kertaalleen vuotanut ja murrettu salasana saattaa myös päätyä osaksi sateenkaaritaulukkoa.
+
+Luvussa~\ref{subsec:entropia} esiteltiin entropian käsite salasanan vahvuuden mittarina. Entropiaa eli salasanan vahvuutta voidaan kasvattaa parhaiten valitsemalla mahdollisimman pitkä salasana. Kuten edellisessä luvussa todettiin, jokainen lisämerkki kaksinkertaistaa murtamiseen vaadittavien arvausten määrän. Toinen entropian laskukaavassa esiintyvä muuttuja $b$, tarkoittaa käytetyn aakkoston kokoa. Salasanan vahvuutta voi siis kasvattaa myös lisäämällä siihen erikoismerkkejä.
+
+Käyttäjän tulisi valita salasana, joka on mahdollisimman pitkä, satunnaisesti muodostettu merkkijono, joka sisältää merkkejä mahdollisimman suuresta aakkostosta (esim. Unicode). Tällainen salasana tarjoaa suojan tunnettuja hyökkäysmenetelmiä vastaan: se on riittävän pitkä väsytyshyökkäystä vastaan eikä sitä löydy sanakirjasta tai sateenkaaritaulukosta. Käyttäjän ei myöskään tarvitse muistaa salasanojaan, jos hän käyttää hyödyksi salasanan hallintaohjelmistoa.
+
+Salasanan sijaan voidaan käyttää myös salalausetta (engl. \textit{passphrase}). Eräs tapa luoda salalause on noppaware (engl. \textit{diceware}), jossa 7776 sanan joukosta arvotaan noppaa heittämällä haluttu määrä sanoja, jotka yhdessä muodostavat salalauseen \citep{reinhold_diceware_2022}. Noppawaren soveltuvuutta on kuitenkin myös kritisoitu. \citet{antonov_security_2020} esittävät, että käytettävän sanalistan koon tulisi olla suurempi, jotta noppawaren avulla luotu salalause olisi riittävän turvallinen.
+
+\section{Salasanakäytännöt\label{sec:salasanakaytannot}}
+
+Usein salasana ei ole kuitenkaan täysin vapaasti käyttäjän päätettävissä, vaan palvelut asettavat salasanoille erilaisia vaatimuksia. Näistä vaatimuksista käytetään myös nimeä salasanakäytäntö (engl. \textit{password policy}).
+
+Salasanakäytäntöjen avulla palvelut pyrkivät ohjaamaan käyttäjiään valitsemaan vahvempia salasanoja. Esimerkiksi vaatimus numeroiden ja erikoismerkkien käyttämisestä kasvattaa suoraan aakkoston kokoa, jolloin salasanan entropia kasvaa. Pelkkien kirjainten käyttämisen estäminen ehkäisee myös sanakirjahyökkäyksen tehokkuutta, kun salasana ei voi löytyä sellaisenaan sanakirjasta, kun siihen on sisällytetty tietty määrä erikoismerkkejä.
+
+\citet{owasp_authentication_2023} määrittelee joukon salasanalle asetettavia vaatimuksia, jotka sovelluskehittäjien olisi hyvä ottaa huomioon salasanakäytännöissään. OWASP suosittelee salasanan vähimmäispituudeksi kahdeksaa merkkiä, joskin myös 12 merkkiä voidaan pitää sopivana salasanan minimipituutena \citep{bosnjak_brute-force_2018}. OWASP:n mukaan salasanan maksimipituutta ei tulisi asettaa liian alhaiseksi, mutta yli 64-merkkisten salasanojen mainitaan saattavan aiheuttaa ongelmia tiettyjen tiivistefunktioiden kohdalla \citep{owasp_authentication_2023}. Salasanan maksimipituuden rajoittaminen saattaa estää salalauseen käyttämisen.
+
+Lisäksi OWASP suosittelee, että kaikki mahdolliset Unicode-merkistön symbolit olisivat sallittuja. Kehittäjän ei siis tulisi rajoittaa sallittua merkistöä pelkästään kirjaimiin, numeroihin ja pieneen määrään erikoismerkkejä. Sallimalla valtava määrä merkkejä pelkkä väsytyshyökkäys muuttuu hyvin hitaaksi, kun hyökkääjän on käytävä läpi entistä suurempi määrä erilaisia yhdistelmiä.
+
+Salasanan koostumuksen määrittelyn lisäksi salasanakäytäntöihin voi kuulua salasanan käyttöajan rajaaminen, jonka jälkeen käyttäjä ei enää pysty kirjautumaan tililleen ennen uuden salasanan asettamista. Käyttäjän syöttämää salasanaa voidaan ennen hyväksymistä myös verrata olemassa oleviin vuodettuihin salasanalistoihin, jolloin vuotaneita salasanoja ei ole mahdollista käyttää palvelussa.
+
+\section{Monivaiheinen tunnistautuminen\label{sec:monivaiheinen_tunnistautuminen}}
+
+Mikäli hyökkääjä on kuitenkin onnistunut selvittämään palvelun käyttäjän salasanan, voidaan luvaton sisäänkirjautuminen vielä estää käyttämällä monivaiheista tunnistautumista (engl. \textit{multi-factor authentication} eli MFA). Monivaiheinen tunnistautuminen on yleensä toteutettu kaksivaiheisena tunnistautumisena (engl. \textit{two-factor authentication} eli 2FA), jossa oikean salasanan syöttämisen jälkeen käyttäjää pyydetään vielä vahvistamaan identiteettinsä ennalta asetetun kanavan kautta. Siinä missä salasana on jotakin mitä käyttäjä tietää, monivaiheinen tunnistautuminen on yleensä jotakin mitä käyttäjällä on.
+
+Tyypillisesti monivaiheinen tunnistautuminen toteutetaan lähettämällä käyttäjän sähköpostiosoitteeseen tai matkapuhelinnumeroon kertakäyttöinen kirjautumiskoodi tai käyttämällä käyttäjän omistamalle laitteelle asennettua erillistä sovellusta. Erillinen MFA-sovellus on turvallisin vaihtoehto, sillä esimerkiksi sähköpostiosoite ei ole sidottu vain yhteen laitteeseen kerrallaan. Päätelaitteen tulee olla ainoastaan käyttäjän hallussa, jotta hänet voidaan tunnistaa luotettavasti. On sovelluskehittäjän vastuulla toteuttaa tuki monivaiheiselle tunnistautumiselle, mutta käyttäjän on osattava ottaa se käyttöön onnistuneesti sekä ymmärrettävä sen toimintamekanismi. Tämä lisää kirjautumisen kognitiivista kuormittavuutta.
+
+Monivaiheisen tunnistautumisen voidaan ajatella olevan viimeinen puolustuslinja, johon hyökkääjä voidaan vielä pysäyttää salasanan päädyttyä vääriin käsiin. MFA:ta hyödyntävälle käyttäjälle saapunut ilmoitus epäilyttävästä kirjautumisyrityksestä saattaa myös paljastaa salasanan päätyneen vääriin käsiin, jolloin se on vaihdettava välittömästi.
+
+Sovelluskehittäjä voi halutessaan tehdä monivaiheisen tunnistautumisen käyttämisestä pakollista, kuten esimerkiksi \citet{github_2fa_2023}. Vaikka salasanan valitsee lopulta käyttäjä itse, kehittäjä voi kuitenkin yrittää ohjata ja opastaa käyttäjää.
+
+Eduistaan huolimatta myös kaksivaiheinen tunnistautuminen on altis hyökkäyksille. Salasanan haltuunsa saanut hyökkääjä saattaa pyrkiä manipuloimaan käyttäjää luovuttamaan MFA-kirjautumiskoodinsa esiintymällä palvelun ylläpitäjänä. Jos MFA:n kirjautumiskoodit lähetetään käyttäjälle SMS-viestinä, hyökkääjä saattaa pyrkiä saamaan haltuunsa SIM-kortin, jolla on sama puhelinnumero kuin hyökkäyksen kohteena olevalla käyttäjällä \citep{hess_vulnerabilities_2021}.

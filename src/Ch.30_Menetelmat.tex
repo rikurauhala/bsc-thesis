@@ -1,0 +1,76 @@
+\chapter{Murtamisen menetelmät\label{ch:menetelmat}}
+
+Salasanojen selvittämiseksi on kehitetty erilaisia menetelmiä. Näistä murtamistekniikoista voidaan käyttää myös tietoturvan parissa yleistä termiä hyökkäys. Tässä luvussa käsitellään muutamia yleisiä kryptografisten tiivisteiden murtamiseen käytettyjä menetelmiä. Erilaisia tekniikoita on kehitetty, sillä ne lähestyvät samaa ongelmaa hieman eri näkökulmasta. Riippuen kohteena olevan salasanan rakenteesta, hyökkäyksen teho voi olla vaihteleva. Hyökkääjä saattaakin hyödyntää useita tekniikoita suorittamalla niitä peräkkäin tai niiden toimintaa yhdistelemällä.
+
+Hyökkäykset suoritetaan käytännössä aina automaattisesti tietokoneen avulla, sillä vain yhden tiivisteen murtamiseksi saatetaan joutua kokeilemaan miljoonia tai miljardeja erilaisia salasanakandidaatteja. Riittävän vahvan salasanan kohdalla on myös mahdollista, että mikään tunnettu menetelmä ei pysty murtamaan sitä kohtuullisessa ajassa.
+
+\section{Väsytyshyökkäys\label{sec:vasytyshyokkays}}
+
+Väsytyshyökkäys (engl. \textit{brute-force attack}) on yksinkertainen salasanojen murtamiseen käytetty menetelmä. Hyökkääjältä ei vaadita erityistä nokkeluutta, vaan hyökkäys perustuu käytössä olevan laitteiston laskentatehoon \citep{bosnjak_brute-force_2018}. Väsytyshyökkäyksen ideana on kokeilla järjestelmällisesti jokaista mahdollista vaihtoehtoa.
+
+Vaikka väsytyshyökkäys eli \textit{raakahyökkäys} on luonteeltaan systemaattista ja hyvin yksinkertaisesti toteutettavissa, voidaan sitäkin tehostaa kiinnittämällä huomiota käytettyyn merkistöön. Mikäli palvelun salasanoille asettamat vaatimukset ovat hyökkääjän tiedossa, voidaan tätä tietoa käyttää hyödyksi hyökkäyksessä. Jos esimerkiksi palvelu on rajoittanut salasanoissaan sallittujen merkkien joukon aakkosnumeeriseen merkistöön, voidaan myös väsytyshyökkäyksessä käytetty merkkien joukko rajoittaa vastaavasti.
+
+Teoriassa väsytyshyökkäyksellä on mahdollista murtaa mikä tahansa salasana. Hyökkäyksen tehokkuus kuitenkin laskee nopeasti salasanan pituuden kasvaessa. Väsytyshyökkäyksellä voidaankin murtaa tehokkaasti lyhyitä salasanoja, mutta pidempien salasanojen murtamiseksi tarvitaan muita keinoja.
+
+\section{Sanakirjahyökkäys\label{sec:sanakirjahyokkays}}
+
+Sanakirjahyökkäys (engl. \textit{dictionary attack}) on väsytyshyökkäystä hienostuneempi menetelmä, joka perustuu ennalta määritellyn sanalistan käyttöön. Hyökkäystä varten valikoitu lista eli sanakirja voi olla esimerkiksi suomen tai englannin kielen sanakirja tai se voi olla luettelo tiedossa olevista oikeista salasanoista. Tällainen lista voi sisältää esimerkiksi yleisimmät salasanat tai tietomurtojen perusteella oikeassa käytössä olleita salasanoja.
+
+Sanakirjahyökkäyksen tehokkuutta on mahdollista optimoida valitsemalla sopiva salasanakandidaattien lista. Jos esimerkiksi murrettavan salasanan valinneen käyttäjän kieli on tiedossa, voidaan hyökkäyksen onnistumisen todennäköisyyttä kasvattaa valitsemalla lista salasanoja, joiden tiedetään olevan kohteena olevan käyttäjän kieltä puhuvien ihmisten valitsemia \citep{bonnea_guessing_2012}.
+
+Tehokas sanakirja useiden salasanojen murtamiseen on lista yleisistä salasanoista. Eräs näistä listoista on salasanojen hallintaohjelmistoa kehittävän Nordpassin kokoama lista, joka perustuu useisiin julkisesti saatavilla oleviin vuotaneita salasanoja sisältäviin lähteisiin \citep{nordpass_2023}. Listan viisikymmentä yleisintä salasanaa on esitelty taulukossa~\ref{tab:yleiset_salasanat}. Kuten huomataan, yleisimmät salasanat koostuvat pitkälti pelkästään numeroista ja kirjaimista. Listaa hallitsevat peräkkäiset numerosarjat (kuten "123456") ja yleiset kirjautumiseen liittyvät luonnollisen kielen sanat (kuten "admin"~ja~"password"). Myös tavallisella QWERTY-näppäimistöllä lähekkäin sijaitsevien merkkien muodostamat salasanat (kuten "qwerty"~ja~"1q2w3e4t") ovat suosittuja.
+
+\begin{table}[ht]
+    \centering
+    \caption{50 yleisintä salasanaa \citep{nordpass_2023}\label{tab:yleiset_salasanat}}
+    \begin{tabular}{ | c | l | c | l | c | l | c | l | c | l | }
+        \hline
+        \# & Salasana   & \# & Salasana    & \# & Salasana & \# & Salasana   & \# & Salasana   \\
+        \hline
+         1 & 123456     & 11 & UNKNOWN     & 21 & 1111     & 31 & abc123     & 41 & 123123123  \\
+         2 & admin      & 12 & 1234567     & 22 & P@ssw0rd & 32 & Aa@123456  & 42 & 11223344   \\
+         3 & 12345678   & 13 & 123123      & 23 & root     & 33 & abcd1234   & 43 & 987654321  \\
+         4 & 123456789  & 14 & 111111      & 24 & 654321   & 34 & 1q2w3e4r   & 44 & demo       \\
+         5 & 1234       & 15 & Password    & 25 & qwerty   & 35 & 123321     & 45 & 12341234   \\
+         6 & 12345      & 16 & 12345678910 & 26 & Pass@123 & 36 & err        & 46 & qwerty123  \\
+         7 & password   & 17 & 000000      & 27 & ******   & 37 & qwertyuiop & 47 & Admin@123  \\
+         8 & 123        & 18 & admin123    & 28 & 112233   & 38 & 87654321   & 48 & 1q2w3e4r5t \\
+         9 & Aa123456   & 19 & ********    & 29 & 102030   & 39 & 987654321  & 49 & 11111111   \\
+        10 & 1234567890 & 20 & user        & 30 & ubnt     & 40 & Eliska81   & 50 & pass       \\
+        \hline
+    \end{tabular}
+\end{table}
+
+Salasanojen lähteenä olevasta palvelusta ja salasanan valinneiden käyttäjien käyttämästä kielestä ja maantieteellisestä sijainnista riippuen yleisimpien salasanojen järjestys voi olla erilainen. Yleisimmät salasanat noudattavat kuitenkin pitkälti samaa kaavaa. Esimerkiksi OWASP:n kokoaman listan kärki eroaa hieman Nordpassin vastaavasta, mutta koostuu sekin tavallisista englanninkielisistä sanoista sekä numeroista \citep{owasp_passwords_2017}. Tulokset eivät ole juurikaan yllättäviä, sillä satunnaisesti valittu riittävän pitkä merkkijono on todennäköisemmin ainutlaatuinen eikä päädy yleisimpien salasanojen listalle. Vahvan salasanan valitsemista käsitellään tarkemmin luvussa~\ref{sec:vahva_salasana}.
+
+\section{Mukautettu hyökkäys\label{sec:mukautettu_hyokkays}}
+
+Salasanoja voidaan yrittää myös murtaa erilaisten sääntöjen avulla. Sääntöihin perustuva hyökkäys (engl. \textit{rule-based attack}) on hienostuneempi hyökkäysmuoto, jossa käyttäjien mahdollisesti salasanoihinsa tekemät muutokset otetaan huomioon. Koska sääntöihin perustuva hyökkäysmenetelmä on hyökkääjän vapaasti konfiguroitavissa, sitä voidaan kutsua myös mukautetuksi tai sovelletuksi hyökkäykseksi.
+
+Mukautettua hyökkäystä voidaan käyttää murtamaan salasanoja, jotka eivät löydy sellaisinaan sanakirjasta tai joiden murtaminen veisi liian kauan pelkän väsytyshyökkäyksen avulla. Sääntöjen avulla voidaan myös generoida sanakirjasta löytyvistä sanoista nopeasti erilaisia variaatioita.
+
+Eräs mahdollinen käyttöskenaario on hyökkäyksen mukauttaminen kohteena olevan palvelun tiedossa olevaa salasanakäytäntöä (ks. luku~\ref{sec:salasanakaytannot}) vastaan. Jos esimerkiksi palvelun salasanakäytäntö vaatii, että salasanasta on löydyttävä neljä numeroa, saattaa hyökkääjä arvella käyttäjän mahdollisesti valinneen jonkin tavallisen sanakirjasta löytyvän sanan ja lisänneen sen perään oman syntymävuotensa. Tällöin voidaan suorittaa muuten tavallinen sanakirjahyökkäys, mutta lisätä jokaisen sanan perään luku esimerkiksi väliltä 1900--1999. Tässä tapauksessa kokeiltavien mahdollisten salasanojen määrä ei kasva eksponentiaalisesti, kuten väsytyshyökkäyksen tapauksessa, vaan säännön avulla kokeiltavien salasanakandidaattien määrä on vain satakertainen.
+
+Tiivisteiden murtamiseen käytetty Hashcat-ohjelmisto tarjoaa useita sääntöjä, joilla salasanoista voidaan luoda nopeasti erilaisia variaatioita. Tällaisia sääntöjä ovat esimerkiksi kaikkien kirjainten muuttaminen isoiksi, tiettyjen kirjainten korvaaminen halutuilla erikoismerkeillä ja numeroiden lisääminen sanan alkuun tai loppuun \citep{hashcat_rule_2023}. 
+
+\section{Sateenkaaritaulukko\label{sec:sateenkaaritaulukko}}
+
+Salasanoja on myös mahdollista selvittää käyttämällä listaa valmiiksi lasketuista tiivisteistä. Tätä menetelmää kutsutaan nimellä sateenkaaritaulukko (engl. \textit{rainbow table}). Kyseessä on kompromissi laskentatehon ja tallennustilan välillä: sateenkaaritaulukkoa käyttämällä hyökkääjän ei tarvitse käyttää laskentatehoa tiivisteiden laskemiseen, mutta käytössä on oltava riittävästi tallennustilaa taulukon arvojen säilyttämiseen. Sateenkaaritaulukon toiminta perustuu siihen, että sama tiivistefunktio laskee annetulle salasanalle aina saman tiivisteen. Nämä tiivisteet voidaan ottaa talteen ja käyttää myöhemmin hyökkäyksen toteuttamisessa. Nykyaikainen sateenkaaritaulukko esiteltiin vuonna 2003 perustuen jo vuonna 1980 julkaistuun menetelmään \citep{oechslin_making_2003}.
+
+Sateenkaaritaulukon toiminta perustuu havaintoon siitä, että tiivistefunktio palauttaa annetulla syötteellä aina saman arvon. Yleisesti käytetyille tiivistefunktioille voidaan siis laskea valmiiksi taulukoita, jotka sisältävät erilaisia salasanakandidaatteja vastaavat tiivisteet. Näitä taulukoita voidaan säilöä ja käyttää myöhemmin hyödyksi useissa hyökkäyksissä. Erityisesti jonkin tietyn heikon salasanan tiiviste tietyllä tiivistealgoritmilla on siis mahdollisesti laskettu jo valmiiksi ennen kuin mitään tietomurtoa on edes tapahtunut.
+
+On huomattava, että sateenkaaritaulukkoa käytettäessä menetelmä alkuperäisen salasanan löytämiseksi muuttuu hieman. Koska tiivisteet on laskettu jo valmiiksi, niitä ei tarvitse enää erikseen laskea jokaisen salasanakandidaatin kohdalla. Algoritmi~\ref{alg:algoritmi2} esittelee mahdollisen tavan käyttää sateenkaaritaulukkoa. Käytetystä tietorakenteesta riippuen selväkielinen salasana voi olla osa taulukkoa tai voidaan toteuttaa funktio \textit{HaeSalasana}, joka noutaa tiivistettä vastaavan selväkielisen salasanan kun täsmäävä tiiviste on löytynyt.
+
+\begin{algorithm}
+    \caption{Salasanan selvittäminen sateenkaaritaulukon avulla\label{alg:algoritmi2}}
+    \begin{algorithmic}[1]
+        \Procedure{vertaaTiivisteitä}{\textit{tiivisteKohde}, \textit{tiivisteKandidaatit}}
+            \For{\textbf{each} \textit{tiivisteKandidaatti} \textbf{in} \textit{tiivisteKandidaatit}}
+                \If{\textit{tiivisteKandidaatti} $=$ \textit{tiivisteKohde}}
+                    \State \textbf{Output:} \Call{HaeSalasana}{\textit{tiivisteKandidaatti}}
+                    \State \textbf{break}
+                \EndIf
+            \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
